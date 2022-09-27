@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <shell.h>
 
 #define MAXBUFFER 128
 
@@ -25,14 +26,21 @@ int main(void){
 
 			if(buffer[inputlen - 1] == '\n'){ //replace newline char with null char
 				buffer[inputlen - 1] = '\0';
-			}	
-			if(strcmp(buffer, "exit") == 0){
-				free(prefix); //replace with a call to a memory freeing function?
-				free(wdpath);
-				running = 0;
 			}
+			
+			if(strcmp(buffer, "exit") == 0){ //calls the exit function
+				exit_ush(prefix, wdpath);
+			}	
+
 		}
 	}while(running);
+}
 
+//Frees the memory allocated to prefix and wdpath
+//Exits the shell
+//Params: char* prefix, char* wdpath
+void exit_ush(char* pf, char* wd){
+	free(pf);
+	free(wd);
 	exit(1);
 }
