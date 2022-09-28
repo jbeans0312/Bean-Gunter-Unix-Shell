@@ -13,3 +13,9 @@ typedef struct PathElement{
 //Exits the shell
 //Returns: None
 void exit_ush(char* pf, char* wp);
+
+//Function that implements the functionality of the pid command - "prints the pid of the shell"
+//Params: None
+//Returns: the pid as the datatype pid_t
+pid_t get_pid();
+

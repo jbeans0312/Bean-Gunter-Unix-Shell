@@ -27,10 +27,14 @@ int main(void){
 			if(buffer[inputlen - 1] == '\n'){ //replace newline char with null char
 				buffer[inputlen - 1] = '\0';
 			}
-			
+
 			if(strcmp(buffer, "exit") == 0){ //calls the exit function
 				exit_ush(prefix, wdpath);
 			}	
+
+			if(strcmp(buffer, "pid") == 0){ //calls the pid function
+				printf("pid: %d\n", get_pid());
+			}
 
 		}
 	}while(running);
@@ -43,4 +47,12 @@ void exit_ush(char* pf, char* wd){
 	free(pf);
 	free(wd);
 	exit(1);
+}
+
+//Function that implements the functionality of the pid command - "prints the pid of the shell"
+//Params: None
+//Returns: the pid as the datatype pid_t
+pid_t get_pid() {
+	pid_t currentPID = getpid();
+	return currentPID;
 }
