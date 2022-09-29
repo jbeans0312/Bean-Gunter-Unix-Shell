@@ -5,6 +5,9 @@
 #include <string.h>
 #include <shell.h>
 
+//External variables
+extern char** environ;
+
 #define MAXBUFFER 128
 #define MAXARGS 10
 
@@ -21,7 +24,6 @@ int main(void){
 
 	char **args=malloc(MAXARGS*sizeof(char*));
 	
-
 	do {
 		printf("%s[%s]> ", prefix, wdpath);
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
@@ -55,6 +57,10 @@ int main(void){
 
 			if(strcmp(args[0], "kill") == 0){ //calls the kill function
 				cmd_kill(args);
+			}
+
+			if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
+				cmd_printenv(args);
 			}
 
 		}
@@ -118,4 +124,28 @@ int cmd_kill(char** args) {
 		status = 0;
 	}
 	return status;
+}
+
+//Function that implements the functionality of the printenv command - "prints the value of an environment variable"
+//If there are no arguments, the function will print all the environment variables and their values
+//If there is one argument, the function will print the value of the environment variable specified by the argument
+//First index in the args array is the command name, second index is the first argument, etc.
+//Params: char** args[]
+//Returns: an integer representing the status of the printenv command - 0 means failure, 1 means success
+int cmd_printenv(char** args) {
+	int status = 0;
+	if(args[1] == NULL) {
+		for(int i = 0; environ[i] != NULL; i++) {
+			printf("%s\n", environ[i]);
+		}
+	} else if(args[2] == NULL) {
+		char* env = getenv(args[1]);
+		if(env != NULL) {
+			printf("%s\n", env);
+		} else {
+			printf("printenv: %s: no such variable\n", args[1]);
+		}
+	} else {
+		printf("printenv: too many arguments\n");
+	}
 }
