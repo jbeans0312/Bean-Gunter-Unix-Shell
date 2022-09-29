@@ -33,3 +33,11 @@ int cmd_kill(char** args);
 //Params: char** args[]
 //Returns: an integer representing the status of the printenv command - 0 means failure, 1 means success
 int cmd_printenv(char** args);
+
+//Function that allows the user to edit the prompt prefix of the shell
+//When the function is called with no arguments, the user is prompted to enter a new prefix
+//When the function is called with an argument, the parameter is set as the new prefix
+//When the function is called with 2 or more arguments, the function prints an error message
+//Params: char* prefix
+//Returns: None
+void cmd_prefix(char** prefix, char** args);

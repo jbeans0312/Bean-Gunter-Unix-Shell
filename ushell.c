@@ -14,7 +14,7 @@ extern char** environ;
 int main(void){
 	char buffer[MAXBUFFER];	
 	//Note to self: initially malloc prompt then use 'realloc' later when prompt is changed
-	char* prefix = malloc(2 * sizeof(char));
+	char* prefix = malloc(128 * sizeof(char));
 	strcpy(prefix, " ");
 	
 	char* wdpath = NULL;
@@ -61,6 +61,10 @@ int main(void){
 
 			if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
 				cmd_printenv(args);
+			}
+
+			if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
+				cmd_prefix(&prefix, args);
 			}
 
 		}
@@ -147,5 +151,29 @@ int cmd_printenv(char** args) {
 		}
 	} else {
 		printf("printenv: too many arguments\n");
+	}
+}
+
+//Function that allows the user to edit the prompt prefix of the shell
+//When the function is called with no arguments, the user is prompted to enter a new prefix
+//When the function is called with an argument, the parameter is set as the new prefix
+//When the function is called with 2 or more arguments, the function prints an error message
+//Params: char* prefix
+//Returns: None
+void cmd_prefix(char** prefix, char** args) {
+	if(args[1] == NULL) {
+		printf("Enter new prefix: ");
+		char* newPrefix = malloc(MAXBUFFER * sizeof(char));
+		fgets(newPrefix, MAXBUFFER, stdin);
+		int inputlen = strlen(newPrefix);
+		if(newPrefix[inputlen - 1] == '\n'){ //replace newline char with null char
+			newPrefix[inputlen - 1] = '\0';
+		}
+		strcpy(*prefix, newPrefix);
+		free(newPrefix);
+	} else if(args[2] == NULL) {
+		strcpy(*prefix, args[1]);
+	} else {
+		printf("prefix: too many arguments\n");
 	}
 }
