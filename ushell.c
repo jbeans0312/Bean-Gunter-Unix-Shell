@@ -53,6 +53,10 @@ int main(void){
 				printf("pid: %d\n", get_pid());
 			}
 
+			if(strcmp(args[0], "kill") == 0){ //calls the kill function
+				cmd_kill(args);
+			}
+
 		}
 	}while(running);
 }
@@ -60,7 +64,7 @@ int main(void){
 //Frees the memory allocated to prefix, wdpath, and args
 //Exits the shell
 //Params: char* prefix, char* wdpath, char** args
-void exit_ush(char* pf, char* wd, char* args){
+void exit_ush(char* pf, char* wd, char** args){
 	free(pf);
 	free(wd);
 	free(args);
@@ -73,4 +77,45 @@ void exit_ush(char* pf, char* wd, char* args){
 pid_t get_pid() {
 	pid_t currentPID = getpid();
 	return currentPID;
+}
+
+//Function that implements the functionality of the kill command - "kills a process"
+//If there is only one argument, the function will kill the process with the pid specified by the argument
+//If there are two arguments and one of them starts with a -, the function will send that signal to the pid specified by the other argument
+//Params: char* args[]
+//Returns: an integer representing the status of the kill command - 0 means failure, 1 means success
+int cmd_kill(char** args) {
+	int status = 0;
+	if(args[1] == NULL) {
+		printf("kill: missing operand\n");
+		status = 0;
+	} else if(args[2] == NULL) {
+		int pid = atoi(args[1]);
+		if(kill(pid, 0) == 0) {
+			kill(pid, SIGTERM);
+			status = 1;
+		} else {
+			printf("kill: invalid pid\n");
+			status = 0;
+		}
+	} else if(args[3] == NULL) {
+		if(args[1][0] == '-') {
+			int signal = atoi(args[1]) * -1;
+			int pid = atoi(args[2]);
+			if(kill(pid, 0) == 0) {
+				kill(pid, signal);
+				status = 1;
+			} else {
+				printf("kill: invalid pid\n");
+				status = 0;
+			}
+		} else {
+			printf("kill: invalid signal\n");
+			status = 0;
+		}
+	} else {
+		printf("kill: too many arguments\n");
+		status = 0;
+	}
+	return status;
 }
