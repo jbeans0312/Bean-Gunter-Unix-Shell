@@ -41,3 +41,10 @@ int cmd_printenv(char** args);
 //Params: char* prefix
 //Returns: None
 void cmd_prefix(char** prefix, char** args);
+
+//Function that prints a line by line list of each file in a given directory
+//Called with no args: prints the files in the working directory
+//Called with a path to a directory: attempts to print the files contained within the given directory
+//Params: char** args[]
+//Returns: an integer representing the status of the list command - 0 means failure, 1 means success
+int cmd_list(char** args);

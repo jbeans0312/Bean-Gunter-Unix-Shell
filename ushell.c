@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <shell.h>
+#include <dirent.h>
 
 //External variables
 extern char** environ;
@@ -67,6 +68,10 @@ int main(void){
 				cmd_prefix(&prefix, args);
 			}
 
+			if(strcmp(args[0], "list") == 0) { //calls the list function
+				cmd_list(args);
+			}
+
 		}
 	}while(running);
 }
@@ -87,6 +92,54 @@ void exit_ush(char* pf, char* wd, char** args){
 pid_t get_pid() {
 	pid_t currentPID = getpid();
 	return currentPID;
+}
+
+//HI WILL, I code on vim, pls copy and paste the comments over here with ur VSC powers :D
+int cmd_list(char** args){
+	int status = 0;
+	DIR *folder;
+	if(args[1] == NULL){
+		//print files in the working dir
+		char* cwd = getcwd(NULL, 0);
+		folder = opendir(cwd);
+		if(folder == NULL){
+			status = 0;
+			printf("list: unable to read directory\n");
+		}else{
+			status = 1;
+			printf("list: reading current directory\n");
+			struct dirent *entry;
+			int file_num = 0;
+			while(entry = readdir(folder)){
+				file_num++;
+				printf("File: %d: %s\n", file_num, entry->d_name);
+			}	
+		}
+		closedir(folder);
+		free(cwd);
+	}else if(args[2] != NULL){
+		//error: too many arguments
+		status = 0;
+		printf("list: too many args\n");
+	}else{
+		//print files in given directory
+		folder = opendir(args[1]);
+		if(folder == NULL){
+			status = 0;
+			printf("list: unable to read directory\n\tgiven directory [ %s ] does not exist\n", args[1]);
+		}else{
+			status = 1;
+			printf("lis: reading %s\n", args[1]);
+			struct dirent *entry;
+			int file_num = 0;
+			while(entry = readdir(folder)){
+				file_num++;
+				printf("File: %d: %s\n", file_num, entry->d_name);
+			}	
+		}
+		closedir(folder);
+	}
+	return(status);	
 }
 
 //Function that implements the functionality of the kill command - "kills a process"
