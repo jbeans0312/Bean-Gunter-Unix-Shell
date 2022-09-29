@@ -96,7 +96,7 @@ pid_t get_pid() {
 
 //HI WILL, I code on vim, pls copy and paste the comments over here with ur VSC powers :D
 int cmd_list(char** args){
-	int status = 0;
+	int status = 0, warning = 0;
 	DIR *folder;
 	if(args[1] == NULL){
 		//print files in the working dir
@@ -117,27 +117,29 @@ int cmd_list(char** args){
 		}
 		closedir(folder);
 		free(cwd);
-	}else if(args[2] != NULL){
-		//error: too many arguments
-		status = 0;
-		printf("list: too many args\n");
 	}else{
-		//print files in given directory
-		folder = opendir(args[1]);
-		if(folder == NULL){
-			status = 0;
-			printf("list: unable to read directory\n\tgiven directory [ %s ] does not exist\n", args[1]);
-		}else{
-			status = 1;
-			printf("lis: reading %s\n", args[1]);
-			struct dirent *entry;
-			int file_num = 0;
-			while(entry = readdir(folder)){
-				file_num++;
-				printf("File: %d: %s\n", file_num, entry->d_name);
-			}	
+		//print files in given directory(ies)(iez)(gg2ez)
+		for(int argnum = 1; args[argnum] != NULL; argnum++){
+			folder = opendir(args[argnum]);
+			printf("list: [%s]", args[argnum]);
+			if(folder == NULL){
+				status = 0;
+				printf("list: unable to read directory\n\tgiven directory [%s] does not exist\n", args[argnum]);
+			}else{
+				status = 1;
+				printf("list: reading %s\n", args[argnum]);
+				struct dirent *entry;
+				int file_num = 0;
+				while(entry = readdir(folder)){
+					file_num++;
+					printf("\tFile: %d: %s\n", file_num, entry->d_name);
+				}	
+			}
+			closedir(folder);
 		}
-		closedir(folder);
+	}
+	if(warning){
+		printf("list: WARNING, one or more given paths are invalid");
 	}
 	return(status);	
 }
