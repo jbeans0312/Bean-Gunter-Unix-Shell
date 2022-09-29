@@ -5,6 +5,9 @@
 #include <string.h>
 #include <shell.h>
 
+//External variables
+extern char** environ;
+
 #define MAXBUFFER 128
 #define MAXARGS 10
 
@@ -21,7 +24,6 @@ int main(void){
 
 	char **args=malloc(MAXARGS*sizeof(char*));
 	
-
 	do {
 		printf("%s[%s]> ", prefix, wdpath);
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
