@@ -5,8 +5,8 @@ DEPS = shell.h
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-ushell: ushell.o
-	$(CC) -o ush ushell.o
+ushell: ushell.o path.o
+	$(CC) -o ush ushell.o path.o
 
 .PHONY: clean
 

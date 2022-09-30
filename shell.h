@@ -8,6 +8,13 @@ typedef struct PathElement{
 	struct PathElement* next;
 }PathElement;
 
+//Params: None
+//Gets the PATH env var and parses it into a linked list
+//Allocates memory for the PATH var (freed internally)
+//Allocates memory for the linked list (needs to be freed externally)
+//Returns: A linked list where each node is a directory in the path
+PathElement* get_path();
+
 //Params: char* prefix and char* wdpath and char** args
 //Frees the memory allocated to the prefix and the memory allocated to the working directory strings
 //Exits the shell
