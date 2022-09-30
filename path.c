@@ -31,9 +31,7 @@ PathElement* get_path() {
 		temp->dir_name = p;
 		temp->next = NULL;
 	} while(p = strtok(NULL, ":"));
-
-	free(p);
-	free(path);
+	
 
 	return(pathlist);
 }
