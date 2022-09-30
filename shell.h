@@ -1,4 +1,4 @@
-
+#include <unistd.h>
 //Defines the PathElement struct which is used to build the linked list that
 //represents the path to the current working drectory
 struct PathElement;
@@ -14,6 +14,10 @@ typedef struct PathElement{
 //Allocates memory for the linked list (needs to be freed externally)
 //Returns: A linked list where each node is a directory in the path
 PathElement* get_path();
+
+int WHERE(char** args);
+
+int WHICH(char** args);
 
 //Params: char* prefix and char* wdpath and char** args
 //Frees the memory allocated to the prefix and the memory allocated to the working directory strings

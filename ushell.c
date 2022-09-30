@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include <string.h>
 #include <shell.h>
 #include <dirent.h>
@@ -70,6 +71,14 @@ int main(void){
 
 			if(strcmp(args[0], "list") == 0) { //calls the list function
 				cmd_list(args);
+			}
+
+			if(strcmp(args[0], "where") == 0) { //calls the where function
+				WHERE(args);
+			}
+
+			if(strcmp(args[0], "which") == 0) { //calls the which function 
+				WHICH(args);
 			}
 
 		}
