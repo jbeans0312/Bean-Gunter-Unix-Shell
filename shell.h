@@ -60,3 +60,10 @@ int cmd_list(char** args);
 //Params: None
 //Returns: None
 void cmd_pwd();
+
+//Function that moves the current working directory to the directory if passed a path in args[1].
+//If no path is passed, the function with chdir to the home directory.
+//If - is the only argument, chdirs to directory previously in
+//Params: char** args[]
+//Returns: an integer representing the status of the cd command - 0 means failure, 1 means success
+void cmd_cd(char** args);

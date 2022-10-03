@@ -17,16 +17,19 @@ int main(void){
 	//Note to self: initially malloc prompt then use 'realloc' later when prompt is changed
 	char* prefix = malloc(128 * sizeof(char));
 	strcpy(prefix, " ");
-	
-	char* wdpath = NULL;
-	wdpath = getcwd(NULL, 0);
+
+	//Get the cwd & move into env variable for later
+	char *wdpath = getcwd(NULL, 0);
+	setenv("OLDPWD", wdpath, 1);
 
 	int running = 1;
 
 	char **args=malloc(MAXARGS*sizeof(char*));
+
+	char* homedir = getenv("HOME");
 	
 	do {
-		printf("%s[%s]> ", prefix, wdpath);
+		printf("%s[%s]> ", prefix, getcwd(NULL, 0));
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
 			int inputlen = strlen(buffer);
 
@@ -76,6 +79,10 @@ int main(void){
 				cmd_pwd();
 			}
 
+			if (strcmp(args[0], "cd") == 0) { //calls the cd function
+				cmd_cd(args);
+			}
+
 		}
 	}while(running);
 }
@@ -87,6 +94,7 @@ void exit_ush(char* pf, char* wd, char** args){
 	free(pf);
 	free(wd);
 	free(args);
+	unsetenv("OLDPWD");
 	exit(1);
 }
 
@@ -245,6 +253,46 @@ void cmd_prefix(char** prefix, char** args) {
 //Params: None
 //Returns: None
 void cmd_pwd() {
-	char* cwd = getcwd(NULL, 0);
-	printf("%s\n", cwd);
+	char *wdpath = getcwd(NULL, 0);
+	printf("%s\n", wdpath);
+}
+
+//Function that moves the current working directory to the directory if passed a path in args[1].
+//If no path is passed, the function with chdir to the home directory.
+//If - is the only argument, chdirs to directory previously in
+//Params: char** args[]
+//Returns: an integer representing the status of the cd command - 0 means failure, 1 means success
+void cmd_cd(char** args) {
+	int status = 0;
+	if(args[1] == NULL || strcmp(args[1], "~") == 0) {
+		char* home = getenv("HOME");
+		if(chdir(home) == 0) {
+			status = 1;
+		} else {
+			printf("cd: unable to change directory\n");
+			status = 0;
+		}
+	} else if(args[2] == NULL) {
+		if(strcmp(args[1], "-") == 0) {
+			if(chdir(getenv("OLDPWD")) == 0) {
+				char *tempDir = getcwd(NULL, 0);
+				status = 1;
+				setenv("OLDPWD", tempDir, 1);
+				free(tempDir);
+			} else {
+				printf("cd: unable to change directory\n");
+				status = 0;
+			}
+		} else {
+			if(chdir(args[1]) == 0) {
+				status = 1;
+			} else {
+				printf("cd: unable to change directory\n");
+				status = 0;
+			}
+		}
+	} else {
+		printf("cd: too many arguments\n");
+		status = 0;
+	}
 }
