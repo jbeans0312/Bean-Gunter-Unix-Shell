@@ -55,3 +55,8 @@ void cmd_prefix(char** prefix, char** args);
 //Params: char** args[]
 //Returns: an integer representing the status of the list command - 0 means failure, 1 means success
 int cmd_list(char** args);
+
+//Function that prints the current working directory
+//Params: None
+//Returns: None
+void cmd_pwd();

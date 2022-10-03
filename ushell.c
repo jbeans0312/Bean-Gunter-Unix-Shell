@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
-#include <shell.h>
+#include <shell.h> 
 #include <dirent.h>
 
 //External variables
@@ -72,6 +72,10 @@ int main(void){
 				cmd_list(args);
 			}
 
+			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
+				cmd_pwd();
+			}
+
 		}
 	}while(running);
 }
@@ -94,7 +98,11 @@ pid_t get_pid() {
 	return currentPID;
 }
 
-//HI WILL, I code on vim, pls copy and paste the comments over here with ur VSC powers :D
+//Function that prints a line by line list of each file in a given directory
+//Called with no args: prints the files in the working directory
+//Called with a path to a directory: attempts to print the files contained within the given directory
+//Params: char** args[]
+//Returns: an integer representing the status of the list command - 0 means failure, 1 means success
 int cmd_list(char** args){
 	int status = 0, warning = 0;
 	DIR *folder;
@@ -231,4 +239,12 @@ void cmd_prefix(char** prefix, char** args) {
 	} else {
 		printf("prefix: too many arguments\n");
 	}
+}
+
+//Function that prints the current working directory
+//Params: None
+//Returns: None
+void cmd_pwd() {
+	char* cwd = getcwd(NULL, 0);
+	printf("%s\n", cwd);
 }
