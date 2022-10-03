@@ -31,15 +31,14 @@ PathElement* get_path() {
 		temp->dir_name = p;
 		temp->next = NULL;
 	} while(p = strtok(NULL, ":"));
-	
 
+
+	free(path);	
 	return(pathlist);
 }
 
-int WHERE(char** args) {
+int WHERE(char** args, PathElement* p) {
 	char cmd[64];
-	PathElement *p;
-	p = get_path();
 	int status = 0;
 
 	if(args[1] == NULL){
@@ -61,10 +60,8 @@ int WHERE(char** args) {
 	return(status);
 }
 
-int WHICH(char** args) {
+int WHICH(char** args, PathElement* p) {
 	char cmd[64];
-	PathElement *p;
-	p = get_path();
 	int status = 0;
 
 	if(args[1] == NULL){

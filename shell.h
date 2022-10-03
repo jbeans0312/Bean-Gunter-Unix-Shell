@@ -15,15 +15,15 @@ typedef struct PathElement{
 //Returns: A linked list where each node is a directory in the path
 PathElement* get_path();
 
-int WHERE(char** args);
+int WHERE(char** args, PathElement* path);
 
-int WHICH(char** args);
+int WHICH(char** args, PathElement* path);
 
 //Params: char* prefix and char* wdpath and char** args
 //Frees the memory allocated to the prefix and the memory allocated to the working directory strings
 //Exits the shell
 //Returns: None
-void exit_ush(char* pf, char* wp, char** args);
+void exit_ush(char* pf, char* wp, PathElement* p,  char** args);
 
 //Function that implements the functionality of the pid command - "prints the pid of the shell"
 //Params: None
