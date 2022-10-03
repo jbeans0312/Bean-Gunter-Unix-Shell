@@ -83,6 +83,10 @@ int main(void){
 				cmd_cd(args);
 			}
 
+			if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
+				cmd_setenv(args);
+			}
+
 		}
 	}while(running);
 }
@@ -294,5 +298,24 @@ void cmd_cd(char** args) {
 	} else {
 		printf("cd: too many arguments\n");
 		status = 0;
+	}
+}
+
+//Function that lets the user set/create an environmental variable.
+//If there are no arguments, the function calls printenv with no arguments
+//If there is one argument, the function creates an environmental variable with the name specified by the argument and an empty value
+//If there are two arguments, the function creates an environmental variable with the name specified by the first argument and the value specified by the second argument
+//If there are more than 2 arguments, the function prints an error message
+//Params: char** args[]
+//Returns: nothing
+void cmd_setenv(char** args) {
+	if(args[1] == NULL) {
+		cmd_printenv(args);
+	} else if(args[2] == NULL) {
+		setenv(args[1], "", 1);
+	} else if(args[3] == NULL) {
+		setenv(args[1], args[2], 1);
+	} else {
+		printf("setenv: too many arguments\n");
 	}
 }
