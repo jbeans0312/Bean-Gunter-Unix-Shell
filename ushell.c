@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include <string.h>
 #include <shell.h> 
 #include <dirent.h>
@@ -25,6 +26,8 @@ int main(void){
 	int running = 1;
 
 	char **args=malloc(MAXARGS*sizeof(char*));
+
+	PathElement* p = get_path();
 
 	char* homedir = getenv("HOME");
 	
@@ -52,7 +55,7 @@ int main(void){
 			}
 
 			if(strcmp(args[0], "exit") == 0){ //calls the exit function
-				exit_ush(prefix, wdpath, args);
+				exit_ush(prefix, wdpath, p, args);
 			}	
 
 			if(strcmp(args[0], "pid") == 0){ //calls the pid function
@@ -75,6 +78,14 @@ int main(void){
 				cmd_list(args);
 			}
 
+
+			if(strcmp(args[0], "where") == 0) { //calls the where function
+				WHERE(args, p);
+			}
+
+			if(strcmp(args[0], "which") == 0) { //calls the which function 
+				WHICH(args, p);
+
 			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
 				cmd_pwd();
 			}
@@ -85,6 +96,7 @@ int main(void){
 
 			if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
 				cmd_setenv(args);
+
 			}
 
 		}
@@ -94,11 +106,23 @@ int main(void){
 //Frees the memory allocated to prefix, wdpath, and args
 //Exits the shell
 //Params: char* prefix, char* wdpath, char** args
-void exit_ush(char* pf, char* wd, char** args){
+void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 	free(pf);
 	free(wd);
 	free(args);
+
+	//code to free PathElement* p
+	PathElement* tmp;
+	while(p){
+		tmp = p;
+		p = p->next;
+		free(tmp);
+	}
+	free(p);
+	freePath();
+
 	unsetenv("OLDPWD");
+
 	exit(1);
 }
 
