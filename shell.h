@@ -15,9 +15,21 @@ typedef struct PathElement{
 //Returns: A linked list where each node is a directory in the path
 PathElement* get_path();
 
+//Params: char** args[]
+//Path is the linked list built by the get_path();
+//Searches for all versions of a program on the path
+//Returns: (1 or 0 for success or failure)
 int WHERE(char** args, PathElement* path);
 
+//Params: char** args[], PathElement* path
+//Path is the linked list built by get_path();
+//Searches for the firste executible version of a program on the path
+//Returns: (1 or 0 for success or failure)
 int WHICH(char** args, PathElement* path);
+
+//Literally just frees the char* path used in get_path()
+//free(path); that is all lol
+void freePath();
 
 //Params: char* prefix and char* wdpath and char** args
 //Frees the memory allocated to the prefix and the memory allocated to the working directory strings

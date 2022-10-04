@@ -6,10 +6,11 @@
 #include <sys/types.h>
 #include <stdlib.h>
 
+char *path, *p;
+
 //Need to free the memory allocated by the linked list
 //Returns: a linked list where each node is a directory in a path
 PathElement* get_path() {
-	char *path, *p;
 	PathElement *temp, *pathlist = NULL;
 	
 	p = getenv("PATH"); //FREE ME
@@ -31,10 +32,14 @@ PathElement* get_path() {
 		temp->dir_name = p;
 		temp->next = NULL;
 	} while(p = strtok(NULL, ":"));
-
-
-	free(path);	
+	
 	return(pathlist);
+}
+
+//Frees the path value
+//No params, no returns
+void freePath(){
+	free(path);
 }
 
 int WHERE(char** args, PathElement* p) {

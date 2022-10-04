@@ -102,6 +102,7 @@ void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 		free(tmp);
 	}
 	free(p);
+	freePath();
 	exit(1);
 }
 
