@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <string.h>
-#include <shell.h>
+#include <shell.h> 
 #include <dirent.h>
 
 //External variables
@@ -18,9 +18,10 @@ int main(void){
 	//Note to self: initially malloc prompt then use 'realloc' later when prompt is changed
 	char* prefix = malloc(128 * sizeof(char));
 	strcpy(prefix, " ");
-	
-	char* wdpath = NULL;
-	wdpath = getcwd(NULL, 0);
+
+	//Get the cwd & move into env variable for later
+	char *wdpath = getcwd(NULL, 0);
+	setenv("OLDPWD", wdpath, 1);
 
 	int running = 1;
 
@@ -28,8 +29,10 @@ int main(void){
 
 	PathElement* p = get_path();
 
+	char* homedir = getenv("HOME");
+	
 	do {
-		printf("%s[%s]> ", prefix, wdpath);
+		printf("%s[%s]> ", prefix, getcwd(NULL, 0));
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
 			int inputlen = strlen(buffer);
 
@@ -75,12 +78,25 @@ int main(void){
 				cmd_list(args);
 			}
 
+
 			if(strcmp(args[0], "where") == 0) { //calls the where function
 				WHERE(args, p);
 			}
 
 			if(strcmp(args[0], "which") == 0) { //calls the which function 
 				WHICH(args, p);
+
+			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
+				cmd_pwd();
+			}
+
+			if (strcmp(args[0], "cd") == 0) { //calls the cd function
+				cmd_cd(args);
+			}
+
+			if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
+				cmd_setenv(args);
+
 			}
 
 		}
@@ -94,6 +110,7 @@ void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 	free(pf);
 	free(wd);
 	free(args);
+
 	//code to free PathElement* p
 	PathElement* tmp;
 	while(p){
@@ -103,6 +120,9 @@ void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 	}
 	free(p);
 	freePath();
+
+	unsetenv("OLDPWD");
+
 	exit(1);
 }
 
@@ -114,7 +134,11 @@ pid_t get_pid() {
 	return currentPID;
 }
 
-//HI WILL, I code on vim, pls copy and paste the comments over here with ur VSC powers :D
+//Function that prints a line by line list of each file in a given directory
+//Called with no args: prints the files in the working directory
+//Called with a path to a directory: attempts to print the files contained within the given directory
+//Params: char** args[]
+//Returns: an integer representing the status of the list command - 0 means failure, 1 means success
 int cmd_list(char** args){
 	int status = 0, warning = 0;
 	DIR *folder;
@@ -250,5 +274,72 @@ void cmd_prefix(char** prefix, char** args) {
 		strcpy(*prefix, args[1]);
 	} else {
 		printf("prefix: too many arguments\n");
+	}
+}
+
+//Function that prints the current working directory
+//Params: None
+//Returns: None
+void cmd_pwd() {
+	char *wdpath = getcwd(NULL, 0);
+	printf("%s\n", wdpath);
+}
+
+//Function that moves the current working directory to the directory if passed a path in args[1].
+//If no path is passed, the function with chdir to the home directory.
+//If - is the only argument, chdirs to directory previously in
+//Params: char** args[]
+//Returns: an integer representing the status of the cd command - 0 means failure, 1 means success
+void cmd_cd(char** args) {
+	int status = 0;
+	if(args[1] == NULL || strcmp(args[1], "~") == 0) {
+		char* home = getenv("HOME");
+		if(chdir(home) == 0) {
+			status = 1;
+		} else {
+			printf("cd: unable to change directory\n");
+			status = 0;
+		}
+	} else if(args[2] == NULL) {
+		if(strcmp(args[1], "-") == 0) {
+			if(chdir(getenv("OLDPWD")) == 0) {
+				char *tempDir = getcwd(NULL, 0);
+				status = 1;
+				setenv("OLDPWD", tempDir, 1);
+				free(tempDir);
+			} else {
+				printf("cd: unable to change directory\n");
+				status = 0;
+			}
+		} else {
+			if(chdir(args[1]) == 0) {
+				status = 1;
+			} else {
+				printf("cd: unable to change directory\n");
+				status = 0;
+			}
+		}
+	} else {
+		printf("cd: too many arguments\n");
+		status = 0;
+	}
+}
+
+//Function that lets the user set/create an environmental variable.
+//If there are no arguments, the function calls printenv with no arguments
+//If there is one argument, the function creates an environmental variable with the name specified by the argument and an empty value
+//If there are two arguments, the function creates an environmental variable with the name specified by the first argument and the value specified by the second argument
+//If there are more than 2 arguments, the function prints an error message
+//Params: char** args[]
+//Returns: nothing
+void cmd_setenv(char** args) {
+	if(args[1] == NULL) {
+		cmd_printenv(args);
+	} else if(args[2] == NULL) {
+		setenv(args[1], "", 1);
+	} else if(args[3] == NULL) {
+		setenv(args[1], args[2], 1);
+	} else {
+		printf("setenv: too many arguments\n");
 	}
 }

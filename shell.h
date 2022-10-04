@@ -71,3 +71,25 @@ void cmd_prefix(char** prefix, char** args);
 //Params: char** args[]
 //Returns: an integer representing the status of the list command - 0 means failure, 1 means success
 int cmd_list(char** args);
+
+//Function that prints the current working directory
+//Params: None
+//Returns: None
+void cmd_pwd();
+
+//Function that moves the current working directory to the directory if passed a path in args[1].
+//If no path is passed, the function with chdir to the home directory.
+//If - is the only argument, chdirs to directory previously in
+//Params: char** args[]
+//Returns: nothing
+void cmd_cd(char** args);
+
+//Function that lets the user set/create an environmental variable.
+//If there are no arguments, the function calls printenv with no arguments
+//If there is one argument, the function creates an environmental variable with the name specified by the argument and an empty value
+//If there are two arguments, the function creates an environmental variable with the name specified by the first argument and the value specified by the second argument
+//If there are more than 2 arguments, the function prints an error message
+//Params: char** args[]
+//Returns: nothing
+void cmd_setenv(char** args);
+
