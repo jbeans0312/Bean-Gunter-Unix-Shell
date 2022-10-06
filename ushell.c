@@ -32,7 +32,9 @@ int main(void){
 	char* homedir = getenv("HOME");
 	
 	do {
-		printf("%s[%s]> ", prefix, getcwd(NULL, 0));
+		char* cwd = getcwd(NULL, 0);
+		printf("%s[%s]> ", prefix, cwd);
+		free(cwd);
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
 			int inputlen = strlen(buffer);
 
@@ -115,7 +117,6 @@ void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 	free(pf);
 	free(wd);
 	free(args);
-
 	//code to free PathElement* p
 	PathElement* tmp;
 	while(p){
@@ -288,6 +289,7 @@ void cmd_prefix(char** prefix, char** args) {
 void cmd_pwd() {
 	char *wdpath = getcwd(NULL, 0);
 	printf("%s\n", wdpath);
+	free(wdpath);
 }
 
 //Function that moves the current working directory to the directory if passed a path in args[1].
