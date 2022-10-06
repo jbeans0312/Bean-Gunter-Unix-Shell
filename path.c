@@ -65,26 +65,31 @@ int WHERE(char** args, PathElement* p) {
 	return(status);
 }
 
-int WHICH(char** args, PathElement* p) {
-	char cmd[64];
-	int status = 0;
+char* WHICH(char** args, PathElement* p) {
+	char *cmd;
+	char c[64];
 
 	if(args[1] == NULL){
-		status = 0;
 		printf("which: invalid arguments");
 	}else if(args[2] != NULL){
-		status = 0;
 		printf("which: too many arguments");
 	}else{
 		while(p){
-			sprintf(cmd, "%s/%s", p->dir_name, args[1]);
-			if(access(cmd, X_OK) == 0){
-				printf("[%s]\n", cmd);
+			sprintf(c, "%s/%s", p->dir_name, args[1]);
+			if(access(c, X_OK) == 0){
+				cmd = malloc(sizeof(char) * (strlen(c)+1));
+				strcpy(cmd, c);
+				cmd[strlen(c)] = '\0';
 				break;
 			}
 			p = p->next;
 		}
-		status = 1;
+		return(cmd);
+
 	}
-	return(status);
+	cmd = malloc((strlen(args[0]) + 1) * sizeof(char));
+	strcpy(cmd, args[0]);
+	cmd[strlen(args[0])] = '\0';
+
+	return(cmd);
 }

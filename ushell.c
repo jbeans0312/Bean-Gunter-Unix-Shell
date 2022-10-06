@@ -84,7 +84,11 @@ int main(void){
 			}
 
 			if(strcmp(args[0], "which") == 0) { //calls the which function 
-				WHICH(args, p);
+				char* cmd = WHICH(args, p);
+				if(strcmp(args[0], cmd) != 0){
+					printf("[%s]\n", cmd);
+					free(cmd);
+				}
 			}
 			
 			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
