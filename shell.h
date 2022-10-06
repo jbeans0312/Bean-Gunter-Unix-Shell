@@ -25,7 +25,7 @@ int WHERE(char** args, PathElement* path);
 //Path is the linked list built by get_path();
 //Searches for the firste executible version of a program on the path
 //Returns: (1 or 0 for success or failure)
-int WHICH(char** args, PathElement* path);
+char* WHICH(char** args, PathElement* path);
 
 //Literally just frees the char* path used in get_path()
 //free(path); that is all lol
