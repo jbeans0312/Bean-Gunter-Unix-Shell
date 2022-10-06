@@ -60,32 +60,31 @@ int main(void){
 				exit_ush(prefix, wdpath, p, args);
 			}	
 
-			if(strcmp(args[0], "pid") == 0){ //calls the pid function
+			else if(strcmp(args[0], "pid") == 0){ //calls the pid function
 				printf("pid: %d\n", get_pid());
 			}
 
-			if(strcmp(args[0], "kill") == 0){ //calls the kill function
+			else if(strcmp(args[0], "kill") == 0){ //calls the kill function
 				cmd_kill(args);
 			}
 
-			if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
+			else if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
 				cmd_printenv(args);
 			}
 
-			if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
+			else if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
 				cmd_prefix(&prefix, args);
 			}
 
-			if(strcmp(args[0], "list") == 0) { //calls the list function
+			else if(strcmp(args[0], "list") == 0) { //calls the list function
 				cmd_list(args);
 			}
 
-
-			if(strcmp(args[0], "where") == 0) { //calls the where function
+			else if(strcmp(args[0], "where") == 0) { //calls the where function
 				WHERE(args, p);
 			}
 
-			if(strcmp(args[0], "which") == 0) { //calls the which function 
+			else if(strcmp(args[0], "which") == 0) { //calls the which function 
 				char* cmd = WHICH(args, p);
 				if(strcmp(args[0], cmd) != 0){
 					printf("[%s]\n", cmd);
@@ -93,17 +92,19 @@ int main(void){
 				}
 			}
 			
-			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
+			else if (strcmp(args[0], "pwd") == 0) { //calls the cd function
 				cmd_pwd();
 			}
 
-			if (strcmp(args[0], "cd") == 0) { //calls the cd function
+			else if (strcmp(args[0], "cd") == 0) { //calls the cd function
 				cmd_cd(args);
 			}
 
-			if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
+			else if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
 				cmd_setenv(args);
 
+			}else{
+				printf("exec eventually\n");
 			}
 
 		}
