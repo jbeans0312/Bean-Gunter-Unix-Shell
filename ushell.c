@@ -103,8 +103,21 @@ int main(void){
 			else if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
 				cmd_setenv(args);
 
-			}else{
-				printf("exec eventually\n");
+			}else{ //exec user programs
+				if(strncmp(args[0], "/", 1) == 0 
+					|| strncmp(args[0], "./", 2) == 0  
+					|| strncmp(args[0], "../", 3) == 0)
+				{ //execute program with absolute path 
+				
+				}else{ //search for and execute programs on search path
+					char* exec_path = WHICH(args, p);
+					if(strcmp(exec_path, "error") == 0){
+						printf("%s: program not found\n", exec_path);
+					}else{
+						printf("path to program: %s\n", exec_path);
+					}
+					free(exec_path);
+				}
 			}
 
 		}

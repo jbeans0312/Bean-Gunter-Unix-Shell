@@ -69,13 +69,24 @@ char* WHICH(char** args, PathElement* p) {
 	char *cmd;
 	char c[64];
 
-	if(args[1] == NULL){
-		printf("which: invalid arguments");
-	}else if(args[2] != NULL){
-		printf("which: too many arguments");
+	if(args[2] != NULL){
+		printf("which: too many arguments\n");
+	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){
+		printf("which: no arguments\n");
 	}else{
+		char* program_name;
+		if(strcmp(args[0], "which") == 0){
+			program_name = malloc(sizeof(char) * (strlen(args[1])+ 1));
+			strcpy(program_name, args[1]);
+			program_name[strlen(args[1])] = '\0';
+		}else{
+			program_name = malloc(sizeof(char) * (strlen(args[0])+1));
+			strcpy(program_name, args[0]);
+			program_name[strlen(args[0])] = '\0';
+		}
+
 		while(p){
-			sprintf(c, "%s/%s", p->dir_name, args[1]);
+			sprintf(c, "%s/%s", p->dir_name, program_name);
 			if(access(c, X_OK) == 0){
 				cmd = malloc(sizeof(char) * (strlen(c)+1));
 				strcpy(cmd, c);
@@ -84,12 +95,13 @@ char* WHICH(char** args, PathElement* p) {
 			}
 			p = p->next;
 		}
+		free(program_name);
 		return(cmd);
 
 	}
-	cmd = malloc((strlen(args[0]) + 1) * sizeof(char));
-	strcpy(cmd, args[0]);
-	cmd[strlen(args[0])] = '\0';
+	cmd = malloc((strlen("error") + 1) * sizeof(char));
+	strcpy(cmd, "error");
+	cmd[strlen("error")] = '\0';
 
 	return(cmd);
 }
