@@ -1,4 +1,6 @@
 #include <unistd.h>
+#include <glob.h>
+
 //Defines the PathElement struct which is used to build the linked list that
 //represents the path to the current working drectory
 struct PathElement;
@@ -97,3 +99,14 @@ void cmd_setenv(char** args);
 //Params: char* args[0] (the name of the program)
 //Returns: none
 void print_status(char* program);
+
+//Function that returns the index of the first occurance of the wildcard character passed in wildcard parameter
+//Returns -1 if there are no wildcard characters
+//Params: char** args[], char wildcard
+//Returns: an integer representing the index of the first wildcard character in the args array
+int find_wildcard(char** args, char wildcard);
+
+//Function that expands wildcard given the list of args, the index of the star wildcard, and the index of the question mark wildcard
+//Params: char** args[], int star_index, int question_index
+//Returns: char** expanded_args (the expanded list of args)
+char** expand_wildcard(char** args,int wildcardIndex);
