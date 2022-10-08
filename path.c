@@ -68,13 +68,13 @@ int WHERE(char** args, PathElement* p) {
 char* WHICH(char** args, PathElement* p) {
 	char *cmd;
 	char c[64];
+	char *program_name;
 
 	if(args[2] != NULL){
 		printf("which: too many arguments\n");
 	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){
 		printf("which: no arguments\n");
 	}else{
-		char* program_name;
 		if(strcmp(args[0], "which") == 0){
 			program_name = malloc(sizeof(char) * (strlen(args[1])+ 1));
 			strcpy(program_name, args[1]);
@@ -96,12 +96,13 @@ char* WHICH(char** args, PathElement* p) {
 			p = p->next;
 		}
 		free(program_name);
-		return(cmd);
-
+		if(p){
+			return(cmd);
+		}
 	}
-	cmd = malloc((strlen("error") + 1) * sizeof(char));
-	strcpy(cmd, "error");
-	cmd[strlen("error")] = '\0';
-
+	sprintf(c, "%s", "error");
+	cmd = malloc((strlen(c) + 1) * sizeof(char));
+	strcpy(cmd, c);
+	cmd[strlen(c)] = '\0';
 	return(cmd);
 }
