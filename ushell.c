@@ -6,6 +6,7 @@
 #include <string.h>
 #include <shell.h> 
 #include <dirent.h>
+#include <sys/stat.h>
 
 //External variables
 extern char** environ;
@@ -57,57 +58,161 @@ int main(void){
 			}
 
 			if(strcmp(args[0], "exit") == 0){ //calls the exit function
+				print_status(args[0]);
 				exit_ush(prefix, wdpath, p, args);
 			}	
 
-			if(strcmp(args[0], "pid") == 0){ //calls the pid function
+			else if(strcmp(args[0], "pid") == 0){ //calls the pid function
+				print_status(args[0]);
 				printf("pid: %d\n", get_pid());
 			}
 
-			if(strcmp(args[0], "kill") == 0){ //calls the kill function
+			else if(strcmp(args[0], "kill") == 0){ //calls the kill function
+				print_status(args[0]);
 				cmd_kill(args);
 			}
 
-			if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
+			else if(strcmp(args[0], "printenv") == 0){ //calls the printenv function
+				print_status(args[0]);
 				cmd_printenv(args);
 			}
 
-			if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
+			else if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
+				print_status(args[0]);
 				cmd_prefix(&prefix, args);
 			}
 
-			if(strcmp(args[0], "list") == 0) { //calls the list function
+			else if(strcmp(args[0], "list") == 0) { //calls the list function
+				print_status(args[0]);
 				cmd_list(args);
 			}
 
-
-			if(strcmp(args[0], "where") == 0) { //calls the where function
+			else if(strcmp(args[0], "where") == 0) { //calls the where function
+				print_status(args[0]);
 				WHERE(args, p);
 			}
 
-			if(strcmp(args[0], "which") == 0) { //calls the which function 
+			else if(strcmp(args[0], "which") == 0) { //calls the which function 
+				print_status(args[0]);
 				char* cmd = WHICH(args, p);
-				if(strcmp(args[0], cmd) != 0){
+				if(strcmp("error", cmd) != 0){
 					printf("[%s]\n", cmd);
-					free(cmd);
+				}else{
+					printf("which: given program not found\n");
 				}
+				free(cmd);
 			}
 			
-			if (strcmp(args[0], "pwd") == 0) { //calls the cd function
+			else if (strcmp(args[0], "pwd") == 0) { //calls the cd function
+				print_status(args[0]);
 				cmd_pwd();
 			}
 
-			if (strcmp(args[0], "cd") == 0) { //calls the cd function
+			else if (strcmp(args[0], "cd") == 0) { //calls the cd function
+				print_status(args[0]);
 				cmd_cd(args);
 			}
 
-			if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
+			else if (strcmp(args[0], "setenv") == 0) { //calls the cd- function
+				print_status(args[0]);
 				cmd_setenv(args);
 
+			}else{ //exec user programs
+				if(strncmp(args[0], "/", 1) == 0 
+					|| strncmp(args[0], "./", 2) == 0  
+					|| strncmp(args[0], "../", 3) == 0)
+				{ //execute program with absolute path
+					struct stat path;
+					stat(args[0], &path);
+					
+					if(S_ISREG(path.st_mode) == 0){ //checks if the given path is a directory
+						printf("given file is a directory, cannot execute\n");
+					}else{
+						if(access(args[0], X_OK) == 0){ //if the given path is not a directory, try to execute
+							pid_t child_pid, wpid;
+							int status;
+
+							child_pid = fork();
+							if(child_pid == -1){ //fork failed
+								perror("fork");
+							}
+
+							if(child_pid == 0){ //fork success
+								print_status(args[0]);
+								int exec_val = execve(args[0], args, NULL);
+
+								if(exec_val == -1){ //exec failure
+									perror("execve");
+								}
+							}else{ //parent process
+								do{
+									wpid = waitpid(child_pid, &status, 0);
+
+									if(wpid == -1){
+										perror("waitpid");
+									}
+									
+									if(WIFEXITED(status)){
+										printf("child exited, status %d\n", WEXITSTATUS(status));
+									}else if(WIFSIGNALED(status)){
+										printf("child killed, status %d\n", WTERMSIG(status));
+									}
+								}while (!WIFEXITED(status) && !WIFSIGNALED(status));
+							}
+						}else{
+							printf("given absolute path does not have execute perms\n");
+						}
+					}
+				}else{ //search for and execute programs on search path
+					char* exec_path = WHICH(args, p);
+					if(strcmp(exec_path, "error") == 0){ //check if the program exists
+						printf("%s: command not found\n", args[0]);
+					}else{ //if program exists, execute program in child process, wait for child process to complete 					 			
+						pid_t child_pid, wpid;
+						int status;
+
+						child_pid = fork();
+						if(child_pid == -1){ //fork failed
+							perror("fork");
+						}
+						
+						if(child_pid == 0){ //fork success, we are in the child process (major W) ez clap ez dub ggwp
+							print_status(args[0]);
+							int exec_val = execve(exec_path, args, NULL);
+
+							if(exec_val == -1){ //exec failure
+								perror("execve");
+							}
+						
+						}else{ //fork success, we are in the parent process wooooo
+							do{
+								wpid = waitpid(child_pid, &status, 0);
+								
+								if(wpid == -1){
+									perror("waitpid");
+								}
+
+								if(WIFEXITED(status)){
+									printf("child exited, status %d\n", WEXITSTATUS(status));
+								}else if(WIFSIGNALED(status)){
+									printf("child killed, status %d\n", WTERMSIG(status));
+								}
+							}while (!WIFEXITED(status) && !WIFSIGNALED(status));
+						}
+					}
+					free(exec_path);
+				}
 			}
 
 		}
 	}while(running);
+}
+
+//Prints the program that the shell is about to exectue
+//Params: args[0] or the path to the program
+//Returns: none
+void print_status(char* program){
+	printf("executing: %s\n", program);
 }
 
 //Frees the memory allocated to prefix, wdpath, and args

@@ -93,3 +93,7 @@ void cmd_cd(char** args);
 //Returns: nothing
 void cmd_setenv(char** args);
 
+//Prints the program that the shell is about to execute
+//Params: char* args[0] (the name of the program)
+//Returns: none
+void print_status(char* program);
