@@ -70,22 +70,22 @@ char* WHICH(char** args, PathElement* p) {
 	char c[64];
 	char *program_name;
 
-	if(args[2] != NULL){
+	if(args[2] != NULL){ //check for 2< arguments
 		printf("which: too many arguments\n");
-	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){
+	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){ //checks if the user just types "which"
 		printf("which: no arguments\n");
 	}else{
-		if(strcmp(args[0], "which") == 0){
+		if(strcmp(args[0], "which") == 0){ //handles if WHICH was called from the command line
 			program_name = malloc(sizeof(char) * (strlen(args[1])+ 1));
 			strcpy(program_name, args[1]);
 			program_name[strlen(args[1])] = '\0';
-		}else{
+		}else{ //handles if WHICH was called from the exec code
 			program_name = malloc(sizeof(char) * (strlen(args[0])+1));
 			strcpy(program_name, args[0]);
 			program_name[strlen(args[0])] = '\0';
 		}
 
-		while(p){
+		while(p){ //iterates through the pathlist and finds the path of the given program
 			sprintf(c, "%s/%s", p->dir_name, program_name);
 			if(access(c, X_OK) == 0){
 				cmd = malloc(sizeof(char) * (strlen(c)+1));
@@ -100,6 +100,7 @@ char* WHICH(char** args, PathElement* p) {
 			return(cmd);
 		}
 	}
+	//if the program is not found, return "error"
 	sprintf(c, "%s", "error");
 	cmd = malloc((strlen(c) + 1) * sizeof(char));
 	strcpy(cmd, c);
