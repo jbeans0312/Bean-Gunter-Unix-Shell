@@ -38,7 +38,8 @@ int main(void){
         	signal(SIGINT, signalHandler);
         	signal(SIGTSTP, signalHandler);
         	signal(SIGTERM, signalHandler);
-		
+		signal(EOF, signalHandler);
+
 		char* cwd = getcwd(NULL, 0);
 		printf("%s[%s]> ", prefix, cwd);
 		free(cwd);
