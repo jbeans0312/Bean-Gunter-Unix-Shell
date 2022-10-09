@@ -170,7 +170,6 @@ int main(void){
 					}else{ //if program exists, execute program in child process, wait for child process to complete 					 			
 						pid_t child_pid, wpid;
 						int status;
-
 						child_pid = fork();
 						if(child_pid == -1){ //fork failed
 							perror("fork");
@@ -178,12 +177,76 @@ int main(void){
 						
 						if(child_pid == 0){ //fork success, we are in the child process (major W) ez clap ez dub ggwp
 							print_status(args[0]);
-							int exec_val = execve(exec_path, args, NULL);
-
-							if(exec_val == -1){ //exec failure
-								perror("execve");
+							//Scan arguments for wildcards
+							int starWildcard = find_wildcard(args, '*');
+							int questionWildcard = find_wildcard(args, '?');
+							char** starExpanded;
+							char** questionExpanded;
+							int starExpandLength = 0;
+							int questionExpandLength = 0;
+							char** expanded_wildcard_args;
+							int num_args = 0;
+							for (int i = 0; args[i] != NULL; i++) {
+								num_args++;
 							}
-						
+							//If starWildCard != -1 or questionWildcard != -1, then we have a wildcard
+							if (starWildcard != -1 || questionWildcard != -1) {
+								if (starWildcard != -1) {
+									//If we have a star wildcard, we need to expand it
+									starExpanded = expand_wildcard(args, starWildcard);
+									while (starExpanded[starExpandLength] != NULL) {
+									starExpandLength++;
+									}
+								}
+								if (questionWildcard != -1) {
+									//If we have a question wildcard, we need to expand it
+									questionExpanded = expand_wildcard(args, questionWildcard);
+									while (questionExpanded[questionExpandLength] != NULL) {
+									questionExpandLength++;
+									}
+								}
+								//Combine it all together with original args
+								expanded_wildcard_args = malloc(MAXBUFFER * (num_args + starExpandLength + questionExpandLength + 1));
+								int i = 0;
+								//Put original args in minus the args that contain the wildcards
+								for(int x = 0; x < num_args; x++) {
+									if (x != starWildcard && x != questionWildcard) {
+										expanded_wildcard_args[i] = args[x];
+										i++;
+									}
+								}
+								//Put the expanded star wildcard args in
+								if (starWildcard != -1) {
+									for (int x = 0; x < starExpandLength; x++) {
+										expanded_wildcard_args[i] = starExpanded[x];
+										i++;
+									}
+								}
+								//Put the expanded question wildcard args in
+								if (questionWildcard != -1) {
+									for (int x = 0; x < questionExpandLength; x++) {
+										expanded_wildcard_args[i] = questionExpanded[x];
+										i++;
+									}
+								}
+								//Put the NULL in
+								expanded_wildcard_args[i] = NULL;
+								if (expanded_wildcard_args[1] == NULL) {
+									printf("No matches for wildcard.\n");
+								}
+								else {
+									int exec_val = execve(exec_path, expanded_wildcard_args, NULL);
+									if(exec_val == -1){ //exec failure
+										perror("execve");
+									}
+								}	
+							} else {
+								//If we don't have a wildcard, we can just execute the program
+								int exec_val = execve(exec_path, args, NULL);
+								if(exec_val == -1){ //exec failure
+									perror("execve");
+								}
+							}
 						}else{ //fork success, we are in the parent process wooooo
 							do{
 								wpid = waitpid(child_pid, &status, 0);
@@ -351,16 +414,20 @@ int cmd_printenv(char** args) {
 	if(args[1] == NULL) {
 		for(int i = 0; environ[i] != NULL; i++) {
 			printf("%s\n", environ[i]);
+			return 1;
 		}
 	} else if(args[2] == NULL) {
 		char* env = getenv(args[1]);
 		if(env != NULL) {
 			printf("%s\n", env);
+			return 1;
 		} else {
 			printf("printenv: %s: no such variable\n", args[1]);
+			return 0;
 		}
 	} else {
 		printf("printenv: too many arguments\n");
+		return 0;
 	}
 }
 
@@ -454,4 +521,38 @@ void cmd_setenv(char** args) {
 	} else {
 		printf("setenv: too many arguments\n");
 	}
+}
+
+//Function that returns the index of the first occurance of the wildcard character passed in wildcard parameter
+//Returns -1 if there are no wildcard characters
+//Params: char** args[], char wildcard
+//Returns: an integer representing the index of the first wildcard character in the args array
+int find_wildcard(char** args, char wildcard) {
+	int index = -1;
+	for(int i = 0; args[i] != NULL; i++) {
+		if(strchr(args[i], wildcard) != NULL) {
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+//Function that expands wildcard given the list of args, the index of the star wildcard, and the index of the question mark wildcard
+//This function only handles star wildcard and question mark wildcard, nothing else
+//Uses glob() to expand the wildcards
+//Params: char** args[], int star_index, int question_index
+//Returns: char** expanded_args (the expanded list of args)
+char** expand_wildcard(char** args,int wildcardIndex) {
+	glob_t globbuf;
+	globbuf.gl_offs = 0;
+	glob(args[wildcardIndex], GLOB_DOOFFS, NULL, &globbuf);
+	char** expanded_args = malloc((globbuf.gl_pathc + 1) * sizeof(char*));
+	for(int i = 0; i < globbuf.gl_pathc; i++) {
+		expanded_args[i] = malloc(MAXBUFFER * sizeof(char));
+		strcpy(expanded_args[i], globbuf.gl_pathv[i]);
+	}
+	expanded_args[globbuf.gl_pathc] = NULL;
+	globfree(&globbuf);
+	return expanded_args;
 }
