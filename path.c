@@ -70,9 +70,7 @@ char* WHICH(char** args, PathElement* p) {
 	char c[64];
 	char *program_name;
 
-	if(args[10] != NULL){ //check for 2< arguments
-		printf("which: too many arguments\n");
-	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){ //checks if the user just types "which"
+	if(args[1] == NULL && strcmp(args[0], "which") == 0){ //checks if the user just types "which"
 		printf("which: no arguments\n");
 	}else{
 		if(strcmp(args[0], "which") == 0){ //handles if WHICH was called from the command line

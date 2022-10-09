@@ -102,13 +102,23 @@ int main(void){
 
 			else if(strcmp(args[0], "which") == 0) { //calls the which function 
 				print_status(args[0]);
-				char* cmd = WHICH(args, p);
-				if(strcmp("error", cmd) != 0){
-					printf("[%s]\n", cmd);
-				}else{
-					printf("which: given program not found\n");
+				char** whichargs = malloc(MAXARGS*sizeof(char*));
+				
+				int i = 1;
+				while(args[i] != NULL){
+					whichargs[0] = "which";
+					whichargs[1] = args[i];
+
+					char* cmd = WHICH(whichargs, p);
+					if(strcmp("error", cmd) != 0){
+						printf("[%s]\n", cmd);
+					}else{
+						printf("which: %s not found\n", whichargs[1]);
+					}
+					i++;
+					free(cmd);
 				}
-				free(cmd);
+				free(whichargs);	
 			}
 			
 			else if (strcmp(args[0], "pwd") == 0) { //calls the cd function
