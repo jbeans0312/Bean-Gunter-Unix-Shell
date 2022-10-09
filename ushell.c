@@ -1,3 +1,6 @@
+//John Bean, Will Gunter
+//CISC361
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -97,7 +100,22 @@ int main(void){
 
 			else if(strcmp(args[0], "where") == 0) { //calls the where function
 				print_status(args[0]);
-				WHERE(args, p);
+				char** whereargs = malloc(MAXARGS*sizeof(char*));
+
+				int i = 1;
+
+				if(args[1] == NULL){
+					printf("where: invalid arguments\n");
+				}
+
+				while(args[i] != NULL){
+					whereargs[0] = "where";
+					whereargs[1] = args[i];
+
+					WHERE(whereargs, p);
+					i++;
+				}
+				free(whereargs);
 			}
 
 			else if(strcmp(args[0], "which") == 0) { //calls the which function 
@@ -105,6 +123,11 @@ int main(void){
 				char** whichargs = malloc(MAXARGS*sizeof(char*));
 				
 				int i = 1;
+
+				if(args[1] == NULL){
+					printf("which: invalid arguments\n");
+				}
+
 				while(args[i] != NULL){
 					whichargs[0] = "which";
 					whichargs[1] = args[i];
@@ -198,7 +221,6 @@ int main(void){
 							//Scan arguments for wildcards
 							int starWildcard = find_wildcard(args, '*');
 							int questionWildcard = find_wildcard(args, '?');
-							printf("stars: %i, questions: %i", starWildcard, questionWildcard);
 							char** starExpanded;
 							char** questionExpanded;
 							int starExpandLength = 0;

@@ -1,3 +1,5 @@
+//John Bean, Will Gunter
+//CISC361
 #include <shell.h>
 #include <stdio.h>
 #include <string.h>
@@ -49,9 +51,6 @@ int WHERE(char** args, PathElement* p) {
 	if(args[1] == NULL){
 		status = 0;
 		printf("where: invalid arguments\n");
-	}else if(args[2] != NULL){
-		status = 0;
-		printf("where: too many arguments\n");
 	}else{
 		while(p){
 			sprintf(cmd, "%s/%s", p->dir_name, args[1]);

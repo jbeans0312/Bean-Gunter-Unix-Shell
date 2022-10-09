@@ -1,3 +1,6 @@
+//John Bean, Will Gunter
+//CISC361
+
 #include <unistd.h>
 #include <glob.h>
 
