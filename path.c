@@ -48,10 +48,10 @@ int WHERE(char** args, PathElement* p) {
 
 	if(args[1] == NULL){
 		status = 0;
-		printf("where: invalid arguments");
+		printf("where: invalid arguments\n");
 	}else if(args[2] != NULL){
 		status = 0;
-		printf("where: too many arguments");
+		printf("where: too many arguments\n");
 	}else{
 		while(p){
 			sprintf(cmd, "%s/%s", p->dir_name, args[1]);
@@ -70,7 +70,7 @@ char* WHICH(char** args, PathElement* p) {
 	char c[64];
 	char *program_name;
 
-	if(args[2] != NULL){ //check for 2< arguments
+	if(args[10] != NULL){ //check for 2< arguments
 		printf("which: too many arguments\n");
 	}else if(args[1] == NULL && strcmp(args[0], "which") == 0){ //checks if the user just types "which"
 		printf("which: no arguments\n");

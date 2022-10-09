@@ -38,14 +38,12 @@ int main(void){
         	signal(SIGINT, signalHandler);
         	signal(SIGTSTP, signalHandler);
         	signal(SIGTERM, signalHandler);
-		signal(EOF, signalHandler);
 
 		char* cwd = getcwd(NULL, 0);
 		printf("%s[%s]> ", prefix, cwd);
 		free(cwd);
 		if(fgets(buffer, MAXBUFFER, stdin) != NULL){
 			int inputlen = strlen(buffer);
-
 			if(buffer[inputlen - 1] == '\n'){ //replace newline char with null char
 				buffer[inputlen - 1] = '\0';
 			}
@@ -87,7 +85,7 @@ int main(void){
 				cmd_printenv(args);
 			}
 
-			else if(strcmp(args[0], "prefix") == 0){ //calls the prefix function
+			else if(strcmp(args[0], "prompt") == 0){ //calls the prefix function
 				print_status(args[0]);
 				cmd_prefix(&prefix, args);
 			}
@@ -136,7 +134,7 @@ int main(void){
 					stat(args[0], &path);
 					
 					if(S_ISREG(path.st_mode) == 0){ //checks if the given path is a directory
-						printf("given file is a directory, cannot execute\n");
+						printf("Not a file, cannot execute.\n");
 					}else{
 						if(access(args[0], X_OK) == 0){ //if the given path is not a directory, try to execute
 							pid_t child_pid, wpid;
@@ -277,6 +275,9 @@ int main(void){
 				}
 			}
 
+		} else {
+			printf("Caught Ctrl-D. Ignoring and continuing...\n");
+			clearerr(stdin);
 		}
 	}while(running);
 }
@@ -307,7 +308,7 @@ void exit_ush(char* pf, char* wd, PathElement* p,  char** args){
 
 	unsetenv("OLDPWD");
 
-	exit(1);
+	exit(0);
 }
 
 //Function that implements the functionality of the pid command - "prints the pid of the shell"
