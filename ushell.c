@@ -231,10 +231,15 @@ int main(void){
 								}
 								//Put the NULL in
 								expanded_wildcard_args[i] = NULL;
-								int exec_val = execve(exec_path, expanded_wildcard_args, NULL);
-								if(exec_val == -1){ //exec failure
-									perror("execve");
+								if (expanded_wildcard_args[1] == NULL) {
+									printf("No matches for wildcard.\n");
 								}
+								else {
+									int exec_val = execve(exec_path, expanded_wildcard_args, NULL);
+									if(exec_val == -1){ //exec failure
+										perror("execve");
+									}
+								}	
 							} else {
 								//If we don't have a wildcard, we can just execute the program
 								int exec_val = execve(exec_path, args, NULL);
