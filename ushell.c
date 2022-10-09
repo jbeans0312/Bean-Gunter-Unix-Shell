@@ -188,6 +188,7 @@ int main(void){
 							//Scan arguments for wildcards
 							int starWildcard = find_wildcard(args, '*');
 							int questionWildcard = find_wildcard(args, '?');
+							printf("stars: %i, questions: %i", starWildcard, questionWildcard);
 							char** starExpanded;
 							char** questionExpanded;
 							int starExpandLength = 0;
@@ -204,6 +205,7 @@ int main(void){
 									starExpanded = expand_wildcard(args, starWildcard);
 									while (starExpanded[starExpandLength] != NULL) {
 									starExpandLength++;
+									printf("star expanded #%i: %s", starExpandLength, starExpanded[starExpandLength]);
 									}
 								}
 								if (questionWildcard != -1) {
@@ -239,8 +241,9 @@ int main(void){
 								}
 								//Put the NULL in
 								expanded_wildcard_args[i] = NULL;
-								if (expanded_wildcard_args[1] == NULL) {
+								if (starExpandLength == 0 && questionExpandLength == 0) {
 									printf("No matches for wildcard.\n");
+									exit(0);
 								}
 								else {
 									int exec_val = execve(exec_path, expanded_wildcard_args, NULL);
