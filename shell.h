@@ -110,3 +110,7 @@ int find_wildcard(char** args, char wildcard);
 //Params: char** args[], int star_index, int question_index
 //Returns: char** expanded_args (the expanded list of args)
 char** expand_wildcard(char** args,int wildcardIndex);
+
+//Function that is run when Control + C (SIGINT), Control + Z (SIGTSTP), and SIGTERM signals are passed to the shell.
+//The function doesn't actually do anything.
+void signalHandler(int);

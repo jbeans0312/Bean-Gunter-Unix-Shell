@@ -15,6 +15,7 @@ extern char** environ;
 #define MAXARGS 10
 
 int main(void){
+
 	char buffer[MAXBUFFER];	
 	//Note to self: initially malloc prompt then use 'realloc' later when prompt is changed
 	char* prefix = malloc(128 * sizeof(char));
@@ -33,6 +34,11 @@ int main(void){
 	char* homedir = getenv("HOME");
 	
 	do {
+		//Signal Catching Code
+        	signal(SIGINT, signalHandler);
+        	signal(SIGTSTP, signalHandler);
+        	signal(SIGTERM, signalHandler);
+		
 		char* cwd = getcwd(NULL, 0);
 		printf("%s[%s]> ", prefix, cwd);
 		free(cwd);
@@ -55,6 +61,9 @@ int main(void){
 				args[i] = token;
 				token = strtok(NULL, " ");
 				i++;
+			}
+			if (args[0] == NULL) {
+				continue;
 			}
 
 			if(strcmp(args[0], "exit") == 0){ //calls the exit function
@@ -555,4 +564,11 @@ char** expand_wildcard(char** args,int wildcardIndex) {
 	expanded_args[globbuf.gl_pathc] = NULL;
 	globfree(&globbuf);
 	return expanded_args;
+}
+
+//Function that is run when Control + C (SIGINT), Control + Z (SIGTSTP), and SIGTERM signals are passed to the shell.
+//The function doesn't actually do anything.
+void signalHandler(int signal) {
+	printf("\nRecieved signal - ignoring...\n");
+	printf("Press enter/return to acknowledge.\n");
 }
